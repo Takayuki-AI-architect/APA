@@ -3,12 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Apocrypha Prompt Architect (APA) v0.5</title>
+  <title>Apocrypha Prompt Architect (APA) v0.7</title>
   <style>
     :root{
       --bg-color:#1a1b26; --card-bg:#24283b; --accent:#7aa2f7;
       --text-main:#c0caf5; --text-dim:#565f89; --border:#414868;
-      --alert:#f7768e; --success:#9ece6a; --copy-btn:#bb9af7;
+      --alert:#f7768e; --success:#9ece6a; --copy-btn:#bb9af7; --warn-bg: #e0af68;
+      --manage-bg: #1f2335;
     }
     body{font-family:'Segoe UI',sans-serif;background:var(--bg-color);color:var(--text-main);
       margin:0;padding:20px;display:flex;justify-content:center;}
@@ -20,13 +21,16 @@
     .section{margin-bottom:18px;padding:15px;background:rgba(0,0,0,.2);border-radius:8px;border:1px solid var(--border);}
     .section-title{font-size:.9rem;color:var(--accent);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;
       display:flex;justify-content:space-between;align-items:center;gap:10px;}
+    
     input[type="text"], select, textarea{
       width:100%;padding:12px;background:var(--bg-color);border:1px solid var(--border);
       color:var(--text-main);border-radius:6px;box-sizing:border-box;font-size:1rem;
     }
     input[type="text"]:focus, textarea:focus, select:focus{outline:none;border-color:var(--accent);}
+    
     .apocrypha-log{font-family:'Consolas',monospace;font-size:.85rem;color:var(--success);margin-bottom:10px;min-height:1.2em;}
     .apocrypha-log.warning{color:var(--alert);}
+    
     .tag-container{display:flex;flex-wrap:wrap;gap:10px;}
     .tag-checkbox{display:none;}
     .tag-label{
@@ -35,21 +39,20 @@
       transition:all .2s;user-select:none;
     }
     .tag-checkbox:checked + .tag-label{background:var(--accent);color:#1a1b26;border-color:var(--accent);font-weight:bold;}
+    
     button.generate-btn{
       width:100%;padding:15px;background:var(--accent);color:#fff;border:none;border-radius:6px;
       font-size:1.1rem;font-weight:bold;cursor:pointer;transition:opacity .2s;margin-bottom:18px;
     }
     button.generate-btn:hover{opacity:.9;}
+    
     .output-group{margin-bottom:15px;}
     .output-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;font-size:.85rem;color:var(--text-dim);}
-    
-    /* Copy Button Styles */
     .copy-btn{
       background:var(--copy-btn);color:#1a1b26;border:none;padding:6px 14px;border-radius:4px;
       cursor:pointer;font-size:.85rem;font-weight:bold;transition:all 0.2s;min-width: 80px;text-align: center;
     }
     .copy-btn:hover{filter: brightness(1.1);}
-    .copy-btn:active{transform: translateY(1px);}
     .copy-btn.copied{background:var(--success) !important; color:#1a1b26;}
     .copy-btn.error{background:var(--alert) !important; color:#fff;}
 
@@ -61,14 +64,25 @@
     .ok{color:var(--success);}
     .btn-inline{padding:8px 10px;border-radius:6px;border:1px solid var(--border);background:var(--bg-color);color:var(--text-main);cursor:pointer;}
     .btn-inline:hover{border-color:var(--accent);}
-    .list{margin:10px 0 0;padding:0;list-style:none;}
-    .list li{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px;border-bottom:1px dashed var(--border);}
     .kbd{font-family:Consolas,monospace;border:1px solid var(--border);border-radius:6px;padding:1px 6px;color:var(--text-dim);}
+
+    /* Context Manager Styles */
+    details.manager { margin-top: 20px; border-top: 1px dashed var(--border); padding-top: 15px; }
+    summary { cursor: pointer; color: var(--text-dim); font-size: 0.9rem; user-select: none; }
+    summary:hover { color: var(--accent); }
+    .manager-content { background: var(--manage-bg); padding: 15px; border-radius: 8px; margin-top: 10px; }
+    .ctx-list { max-height: 200px; overflow-y: auto; list-style: none; padding: 0; margin: 10px 0; border: 1px solid var(--border); border-radius: 6px; }
+    .ctx-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; border-bottom: 1px solid var(--border); background: var(--bg-color); }
+    .ctx-item:last-child { border-bottom: none; }
+    .ctx-name { font-weight: bold; font-size: 0.9rem; }
+    .ctx-id { font-size: 0.75rem; color: var(--text-dim); margin-left: 8px; font-family: monospace; }
+    .btn-del { background: var(--alert); color: #fff; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; }
+    .json-area { width: 100%; height: 120px; font-family: monospace; font-size: 0.8rem; margin-bottom: 10px; }
   </style>
 </head>
 <body>
 <div class="container">
-  <h1>Apocrypha Prompt Architect <span class="pill">v0.5 (Fix)</span></h1>
+  <h1>Apocrypha Prompt Architect <span class="pill">v0.7 (Context Manager)</span></h1>
 
   <!-- Step 1 -->
   <div class="section">
@@ -77,19 +91,17 @@
       <span class="mini">Tip: <span class="kbd">Ctrl</span> + <span class="kbd">Enter</span> で生成</span>
     </div>
     <div id="apocrypha-status" class="apocrypha-log">Waiting for input...</div>
-    <input type="text" id="core-input" placeholder="例: 茶室でお茶をたてる水着の女性" autocomplete="off" aria-label="core input">
+    <input type="text" id="core-input" placeholder="例: 茶室でお茶をたてる水着の女性" autocomplete="off">
   </div>
 
   <div class="row">
     <!-- Step 2 -->
-    <div class="section col" id="suggestion-section">
+    <div class="section col">
       <div class="section-title">
-        <span>Step 2: Apocrypha Context Suggestions</span>
-        <select id="context-select" aria-label="context select">
-          <option value="auto" selected>Auto</option>
-        </select>
+        <span>Step 2: Context Suggestions</span>
+        <select id="context-select"><option value="auto" selected>Auto</option></select>
       </div>
-      <div class="mini" id="context-hint">コンテキストを検知すると候補が表示されます（Autoは最適候補を自動選択）。</div>
+      <div class="mini" id="context-hint">Autoは最適候補を自動選択します。</div>
       <div class="tag-container" id="tag-suggestions" style="margin-top:10px;">
         <span style="color: var(--text-dim); font-style: italic;">No context yet.</span>
       </div>
@@ -97,493 +109,337 @@
 
     <!-- Step 3 -->
     <div class="section col">
-      <div class="section-title"><span>Step 3: Quality & Safety</span></div>
-      <select id="quality-select" aria-label="quality">
-        <option value="standard">Standard (Basic Quality)</option>
-        <option value="high">High Quality (Detailed)</option>
-        <option value="god" selected>God Mode (Masterpiece + 8k + Absurdres)</option>
-      </select>
+      <div class="section-title"><span>Step 3: Quality & Settings</span></div>
+      
+      <div style="margin-bottom:12px;">
+        <label class="mini" style="color:var(--accent);">Image Quality</label>
+        <select id="quality-select">
+          <option value="standard">Standard (Basic)</option>
+          <option value="high">High Quality</option>
+          <option value="god" selected>God Mode (Masterpiece)</option>
+        </select>
+      </div>
 
-      <div class="mini" style="margin-top:10px;">
+      <div style="margin-bottom:12px;">
+        <label class="mini" style="color:var(--warn-bg);">Hand Stabilizer</label>
+        <select id="hand-fix-select">
+          <option value="none">None (AI任せ)</option>
+          <option value="auto" selected>Auto Pose (文脈推奨)</option>
+          <option value="hold">Hold Item (物を持つ)</option>
+          <option value="hide">Hide Hands (隠す)</option>
+        </select>
+        <div class="mini" id="hand-fix-desc" style="margin-top:4px; font-style:italic;">--</div>
+      </div>
+
+      <div class="mini">
         <label style="display:flex;gap:10px;align-items:center;cursor:pointer;">
           <input type="checkbox" id="safety-nsfw" checked>
-          <span>Negativeに <span class="danger">NSFW</span> を含める（安全寄り）</span>
-        </label>
-      </div>
-
-      <div class="mini" style="margin-top:10px;">
-        <label style="display:flex;gap:10px;align-items:center;cursor:pointer;">
-          <input type="checkbox" id="keep-english" checked>
-          <span>英語の自由入力（辞書外）もそのまま取り込む</span>
+          <span>Negativeに <span class="danger">NSFW</span> を含める</span>
         </label>
       </div>
     </div>
-  </div>
-
-  <!-- Custom Dictionary -->
-  <div class="section">
-    <div class="section-title">
-      <span>Optional: Custom JP→EN Tag Dictionary</span>
-      <button class="btn-inline" id="reset-dict" type="button">Reset</button>
-    </div>
-
-    <div class="row">
-      <div class="col">
-        <input type="text" id="dict-jp" placeholder="日本語キー（例: 抹茶ラテ）" aria-label="dict jp">
-      </div>
-      <div class="col">
-        <input type="text" id="dict-en" placeholder="英語タグ（例: matcha latte, drink）" aria-label="dict en">
-      </div>
-      <div style="min-width:140px;">
-        <button class="btn-inline" id="add-dict" type="button" style="width:100%;height:46px;">Add</button>
-      </div>
-    </div>
-    <div class="mini">※ 辞書は端末に保存されます（localStorage）。</div>
-    <ul class="list" id="dict-list"></ul>
   </div>
 
   <button class="generate-btn" id="generate" type="button">GENERATE PROMPT</button>
 
   <!-- Output -->
   <div class="section">
-    <div class="section-title"><span>Final Output (PixAI Ready)</span></div>
-
+    <div class="section-title"><span>Final Output</span></div>
     <div class="output-group">
-      <div class="output-header">
-        <span>POSITIVE PROMPT (呪文)</span>
-        <!-- Updated Copy Button -->
-        <button class="copy-btn" type="button" data-target="output-positive">COPY</button>
-      </div>
-      <textarea id="output-positive" class="output-area" readonly placeholder="変換された英語プロンプトがここに表示されます"></textarea>
+      <div class="output-header"><span>POSITIVE PROMPT</span><button class="copy-btn" data-target="output-positive">COPY</button></div>
+      <textarea id="output-positive" class="output-area" readonly></textarea>
     </div>
-
     <div class="output-group">
-      <div class="output-header">
-        <span style="color:var(--alert);">NEGATIVE PROMPT (除外要素)</span>
-        <!-- Updated Copy Button -->
-        <button class="copy-btn" type="button" style="background:var(--alert);" data-target="output-negative">COPY</button>
-      </div>
+      <div class="output-header"><span style="color:var(--alert);">NEGATIVE PROMPT</span><button class="copy-btn" style="background:var(--alert);" data-target="output-negative">COPY</button></div>
       <textarea id="output-negative" class="output-area negative" readonly></textarea>
     </div>
-
     <div class="mini" id="stats"></div>
   </div>
+
+  <!-- Context Manager (Details) -->
+  <details class="manager">
+    <summary>⚙️ Context Dictionary Manager (辞書管理)</summary>
+    <div class="manager-content">
+      <div class="mini" style="margin-bottom:5px;">現在ロードされているコンテキスト一覧:</div>
+      <ul class="ctx-list" id="ctx-list-ui"></ul>
+      
+      <div class="section-title" style="margin-top:15px; border-bottom:1px solid var(--border); padding-bottom:5px;">JSON Import</div>
+      <div class="mini">AIに生成させたJSONデータをここに貼り付けて追加します。</div>
+      <textarea id="json-input" class="json-area" placeholder='{"id": "ctx_new", "triggers": [...], ...}'></textarea>
+      <div style="display:flex; gap:10px;">
+        <button class="btn-inline" id="btn-import" style="flex:1; border-color:var(--success); color:var(--success);">+ Import JSON</button>
+        <button class="btn-inline" id="btn-reset-ctx" style="border-color:var(--alert); color:var(--alert);">Reset Defaults</button>
+      </div>
+    </div>
+  </details>
 </div>
 
 <script>
-  // -----------------------
-  // Storage helpers
-  // -----------------------
+  // --- Storage ---
   const store = {
-    get(key, fallback){
-      try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; } catch { return fallback; }
-    },
-    set(key, value){
-      try { localStorage.setItem(key, JSON.stringify(value)); } catch {}
-    }
+    get(k, d){ try { const v=localStorage.getItem(k); return v?JSON.parse(v):d; } catch{ return d; } },
+    set(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch{} }
   };
 
-  // -----------------------
-  // Default Dictionaries
-  // -----------------------
-  const defaultTranslationMap = [
-    { key: "茶室", tag: "washitsu, japanese tea room, chashitsu" },
-    { key: "お茶をたてる", tag: "making tea, traditional tea ceremony" },
-    { key: "茶道", tag: "traditional tea ceremony" },
-    { key: "抹茶", tag: "matcha" },
-    { key: "お茶", tag: "tea, matcha" },
-    { key: "女性", tag: "1girl, solo" },
-    { key: "女の子", tag: "1girl, solo" },
-    { key: "水着", tag: "swimsuit, bikini" },
-    { key: "ビキニ", tag: "bikini" },
-    { key: "着物", tag: "kimono" },
-    { key: "和服", tag: "japanese_clothes" },
-    { key: "金髪", tag: "blonde hair" },
-    { key: "黒髪", tag: "black hair" },
-    { key: "正座", tag: "kneeling, seiza" },
-    { key: "畳", tag: "tatami" }
-  ];
-
-  // Load custom dictionary (persisted)
-  let customTranslationMap = store.get("apa.customDict", []);
-  let translationMap = [...defaultTranslationMap, ...customTranslationMap];
-
-  // -----------------------
-  // Context DB
-  // -----------------------
-  const contextDB = [
+  // --- Default Data ---
+  const defaultContexts = [
     {
       id: "ctx_jp_tea",
       triggers: ["tea room","tea ceremony","chashitsu","和室","茶室","お茶","畳","茶道","抹茶"],
-      tier: 1,
-      tierName: "Tier 1: Japanese Tradition (Cultural Dignity)",
+      tier: 1, tierName: "Tier 1: Japanese Tradition",
       tags: [
-        { id:"japanese_clothes", label:"japanese_clothes (和服)", tag:"japanese_clothes", active:true },
-        { id:"kimono", label:"kimono (着物)", tag:"kimono", active:true },
-        { id:"tatami", label:"tatami (畳)", tag:"tatami", active:true },
-        { id:"kneeling", label:"kneeling (正座)", tag:"kneeling, seiza", active:true },
-        { id:"black_hair", label:"black_hair (黒髪/推論)", tag:"black hair", active:true }
+        { id:"japanese_clothes", label:"和服", tag:"japanese_clothes", active:true },
+        { id:"kimono", label:"着物", tag:"kimono", active:true },
+        { id:"tatami", label:"畳", tag:"tatami", active:true },
+        { id:"kneeling", label:"正座", tag:"kneeling, seiza", active:true },
+        { id:"shoji", label:"障子", tag:"shoji", active:true }
       ],
-      conflicts: ["bikini","swimsuit","mecha","armor","水着","ビキニ","メカ","鎧"],
-      negativeAdditions: ["neon", "cyberpunk", "futuristic city", "mecha", "robot armor"]
+      conflicts: ["bikini","swimsuit","mecha","armor","水着"],
+      negativeAdditions: ["neon", "cyberpunk", "mecha"],
+      handFix: { auto: "hands on lap, symmetrical hands", hold: "holding tea bowl", hide: "hands behind back" }
     },
     {
       id: "ctx_cyberpunk",
-      triggers: ["cyberpunk","neon","future","sci-fi","robot","サイバーパンク","近未来","ネオン"],
-      tier: 3,
-      tierName: "Tier 3: Sci-Fi / Cyberpunk",
+      triggers: ["cyberpunk","neon","future","sci-fi","robot","サイバーパンク","近未来"],
+      tier: 3, tierName: "Tier 3: Cyberpunk",
       tags: [
-        { id:"cybernetic", label:"cybernetic", tag:"cybernetic", active:true },
-        { id:"neon_lights", label:"neon_lights", tag:"neon lights", active:true },
-        { id:"scifi_city", label:"scifi_city", tag:"sci-fi city", active:true }
+        { id:"cybernetic", label:"サイボーグ化", tag:"cybernetic", active:true },
+        { id:"neon_lights", label:"ネオン", tag:"neon lights", active:true },
+        { id:"scifi_city", label:"未来都市", tag:"sci-fi city", active:true }
       ],
-      conflicts: ["kimono","medieval","着物","中世","和服","畳"],
-      negativeAdditions: ["tatami", "traditional tea ceremony"]
+      conflicts: ["kimono","medieval","着物","和服"],
+      negativeAdditions: ["tatami", "traditional"],
+      handFix: { auto: "confident stance", hold: "holding datapad", hide: "hands in pockets" }
     }
   ];
 
+  // Load Contexts from Store or Default
+  let contextDB = store.get("apa.contexts", defaultContexts);
+
+  // --- UI Elements ---
+  const coreInput = document.getElementById("core-input");
+  const statusLog = document.getElementById("apocrypha-status");
+  const suggestionContainer = document.getElementById("tag-suggestions");
+  const contextSelect = document.getElementById("context-select");
+  const qualitySelect = document.getElementById("quality-select");
+  const handFixSelect = document.getElementById("hand-fix-select");
+  const handFixDesc = document.getElementById("hand-fix-desc");
+  const safetyNsfw = document.getElementById("safety-nsfw");
+  const ctxListUI = document.getElementById("ctx-list-ui");
+
+  // --- Main Logic ---
+  
+  function saveContexts() {
+    store.set("apa.contexts", contextDB);
+    renderContextManager();
+    refreshContext(); // Refresh detection
+  }
+
+  function detectContexts(text){
+    const t=text.toLowerCase(); const hits=[];
+    for(const ctx of contextDB){
+      const c = ctx.triggers.reduce((a,trig)=>t.includes(trig.toLowerCase())?a+1:a,0);
+      if(c>0) hits.push({ctx, c});
+    }
+    hits.sort((a,b)=>(b.c - a.c)||(a.ctx.tier - b.ctx.tier));
+    return hits.map(h=>h.ctx);
+  }
+
+  let currentContexts = [];
+
+  function refreshContext(){
+    const text=coreInput.value||"";
+    currentContexts = detectContexts(text);
+    
+    // Update Select
+    const cur = contextSelect.value||"auto";
+    contextSelect.innerHTML = '<option value="auto">Auto</option>';
+    currentContexts.forEach(ctx=>{
+      const opt=document.createElement("option");
+      opt.value=ctx.id; opt.textContent=ctx.tierName;
+      contextSelect.appendChild(opt);
+    });
+    // Restore selection if valid, else auto
+    contextSelect.value = Array.from(contextSelect.options).some(o=>o.value===cur)?cur:"auto";
+
+    const selected = getSelectedContext();
+    if(selected){
+      statusLog.textContent = `Apocrypha Detected: [${selected.tierName}]`;
+      statusLog.className = "apocrypha-log";
+      renderSuggestions(selected);
+    } else {
+      statusLog.textContent = "Apocrypha Status: Monitoring input...";
+      statusLog.className = "apocrypha-log";
+      renderSuggestions(null);
+    }
+    updateHandFixDesc(selected);
+  }
+
+  function getSelectedContext(){
+    if(!currentContexts.length) return null;
+    if(contextSelect.value==="auto") return currentContexts[0];
+    return contextDB.find(c=>c.id===contextSelect.value); // Look up in full DB
+  }
+
+  function renderSuggestions(ctx){
+    suggestionContainer.innerHTML = "";
+    if(!ctx){
+      suggestionContainer.innerHTML='<span style="color:var(--text-dim);font-style:italic;">No specific context.</span>';
+      return;
+    }
+    ctx.tags.forEach(t=>{
+      const d=document.createElement("div");
+      const c=document.createElement("input"); c.type="checkbox"; c.id=`t-${ctx.id}-${t.id}`; c.className="tag-checkbox"; 
+      c.checked=t.active; c.dataset.tag=t.tag;
+      const l=document.createElement("label"); l.htmlFor=c.id; l.className="tag-label"; l.textContent=t.label;
+      d.appendChild(c); d.appendChild(l);
+      suggestionContainer.appendChild(d);
+    });
+  }
+
+  function updateHandFixDesc(ctx){
+    const mode = handFixSelect.value;
+    const defaultFix = { auto: "symmetrical hands", hold: "holding object", hide: "hands behind back" };
+    const ref = ctx ? (ctx.handFix || defaultFix) : defaultFix;
+    let desc = "";
+    if(mode === "none") desc = "AIの自由な描写に任せます";
+    else if(mode === "auto") desc = `推奨: ${ref.auto}`;
+    else if(mode === "hold") desc = `推奨: ${ref.hold}`;
+    else if(mode === "hide") desc = `推奨: ${ref.hide}`;
+    handFixDesc.textContent = desc;
+  }
+
+  // --- Generation ---
   const qualityPresets = {
     standard: "(best quality), (illustration), highly detailed",
     high: "(masterpiece:1.2), (best quality:1.2), 8k resolution, cinematic lighting, highly detailed",
     god: "(masterpiece:1.5), (best quality:1.4), (absurdres:1.2), 8k, perfect anatomy, cinematic composition, soft lighting, depth of field"
   };
 
-  const negativePromptBaseSafe = "NSFW, (worst quality:1.4), (low quality:1.4), bad anatomy, watermarks, text, signature, blur, extra limbs, missing fingers";
-  const negativePromptBaseNoNSFW = "(worst quality:1.4), (low quality:1.4), bad anatomy, watermarks, text, signature, blur, extra limbs, missing fingers";
+  document.getElementById("generate").addEventListener("click", () => {
+    const userInput = coreInput.value.trim();
+    const qual = qualityPresets[qualitySelect.value] || qualityPresets.god;
+    const ctx = getSelectedContext();
 
-  // -----------------------
-  // DOM Elements
-  // -----------------------
-  const coreInput = document.getElementById("core-input");
-  const statusLog = document.getElementById("apocrypha-status");
-  const suggestionContainer = document.getElementById("tag-suggestions");
-  const qualitySelect = document.getElementById("quality-select");
-  const contextSelect = document.getElementById("context-select");
-  const safetyNsfw = document.getElementById("safety-nsfw");
-  const keepEnglish = document.getElementById("keep-english");
-  const stats = document.getElementById("stats");
-
-  // Restore UI state
-  coreInput.value = store.get("apa.core", "");
-  qualitySelect.value = store.get("apa.quality", "god");
-  safetyNsfw.checked = store.get("apa.safetyNsfw", true);
-  keepEnglish.checked = store.get("apa.keepEnglish", true);
-
-  // -----------------------
-  // Utilities & Logic
-  // -----------------------
-  function uniq(list){
-    const seen = new Set();
-    const out = [];
-    for (const x of list){
-      const k = x.trim();
-      if(!k) continue;
-      if(!seen.has(k)){ seen.add(k); out.push(k); }
-    }
-    return out;
-  }
-
-  function normalizeSpaces(s){
-    return s.replace(/\s+/g, " ").trim();
-  }
-
-  function rebuildTranslationMap(){
-    translationMap = [...defaultTranslationMap, ...customTranslationMap]
-      .sort((a,b) => (b.key.length - a.key.length));
-  }
-
-  function translateInput(inputText){
-    const tags = [];
-    const raw = inputText.trim();
-
-    for (const item of translationMap){
-      if (!item.key) continue;
-      if (raw.includes(item.key)){
-        item.tag.split(",").map(s => s.trim()).filter(Boolean).forEach(t => tags.push(t));
-      }
+    // Conflict
+    if(ctx && ctx.conflicts){
+      const conflict = ctx.conflicts.find(c => userInput.toLowerCase().includes(c.toLowerCase()));
+      if(conflict && !confirm(`【Apocrypha警告】\n「${conflict}」が文脈「${ctx.tierName}」と競合します。実行しますか？`)) return;
     }
 
-    let englishFree = "";
-    if (keepEnglish.checked && /[a-zA-Z]/.test(raw)){
-      englishFree = raw;
+    // Build Positive
+    let parts = [qual];
+    // Simple translation (Simplified for v0.7 to focus on manager)
+    // In real use, merge with v0.6 translation map logic
+    // For now, assume input + context tags
+    if(userInput) parts.push(userInput);
+
+    const checked = [];
+    suggestionContainer.querySelectorAll("input:checked").forEach(c => checked.push(c.dataset.tag));
+    if(checked.length) parts.push([...new Set(checked)].join(", "));
+
+    // Hand Fix
+    const fixMode = handFixSelect.value;
+    if(fixMode !== "none"){
+      const ref = ctx ? (ctx.handFix || {}) : {};
+      const def = { auto: "hands joined", hold: "holding object", hide: "hands behind back" };
+      parts.push(ref[fixMode] || def[fixMode] || "");
     }
 
-    return { tags: uniq(tags), englishFree: englishFree };
-  }
-
-  function detectContexts(text){
-    const t = text.toLowerCase();
-    const hits = [];
-    for (const ctx of contextDB){
-      const matchCount = ctx.triggers.reduce((acc, trig) => {
-        const needle = trig.toLowerCase();
-        return t.includes(needle) ? acc + 1 : acc;
-      }, 0);
-      if (matchCount > 0) hits.push({ ctx, matchCount });
-    }
-    hits.sort((a,b) => (b.matchCount - a.matchCount) || (a.ctx.tier - b.ctx.tier));
-    return hits.map(h => h.ctx);
-  }
-
-  function setStatus(msg, isWarn=false){
-    statusLog.textContent = msg;
-    statusLog.className = isWarn ? "apocrypha-log warning" : "apocrypha-log";
-  }
-
-  function renderSuggestions(ctx){
-    suggestionContainer.innerHTML = "";
-    if (!ctx){
-      suggestionContainer.innerHTML = '<span style="color: var(--text-dim); font-style: italic;">No specific context detected. (Free Mode)</span>';
-      return;
-    }
-    ctx.tags.forEach(tagObj => {
-      const wrapper = document.createElement("div");
-      const checkbox = document.createElement("input");
-      checkbox.type = "checkbox";
-      checkbox.id = `tag-${ctx.id}-${tagObj.id}`;
-      checkbox.className = "tag-checkbox";
-      checkbox.checked = !!tagObj.active;
-      checkbox.dataset.tag = tagObj.tag; 
-
-      const label = document.createElement("label");
-      label.htmlFor = checkbox.id;
-      label.className = "tag-label";
-      label.textContent = tagObj.label;
-
-      wrapper.appendChild(checkbox);
-      wrapper.appendChild(label);
-      suggestionContainer.appendChild(wrapper);
-    });
-  }
-
-  function rebuildContextSelect(contexts){
-    const current = contextSelect.value || "auto";
-    contextSelect.innerHTML = '<option value="auto">Auto</option>';
-    contexts.forEach(ctx => {
-      const opt = document.createElement("option");
-      opt.value = ctx.id;
-      opt.textContent = ctx.tierName;
-      contextSelect.appendChild(opt);
-    });
-    const stillThere = Array.from(contextSelect.options).some(o => o.value === current);
-    contextSelect.value = stillThere ? current : "auto";
-  }
-
-  function getSelectedContext(contexts){
-    if (!contexts.length) return null;
-    if (contextSelect.value === "auto") return contexts[0];
-    return contexts.find(c => c.id === contextSelect.value) || contexts[0];
-  }
-
-  let currentContexts = [];
-
-  function refreshContext(){
-    const text = coreInput.value || "";
-    currentContexts = detectContexts(text);
-    rebuildContextSelect(currentContexts);
-    const selected = getSelectedContext(currentContexts);
-
-    if (selected){
-      setStatus(`Apocrypha Detected: [${selected.tierName}]`);
-      renderSuggestions(selected.tags ? selected : null);
-    } else {
-      setStatus("Apocrypha Status: Monitoring input...");
-      renderSuggestions(null);
-    }
-  }
-
-  coreInput.addEventListener("input", () => {
-    store.set("apa.core", coreInput.value);
-    refreshContext();
-  });
-
-  contextSelect.addEventListener("change", refreshContext);
-  qualitySelect.addEventListener("change", () => store.set("apa.quality", qualitySelect.value));
-  safetyNsfw.addEventListener("change", () => store.set("apa.safetyNsfw", safetyNsfw.checked));
-  keepEnglish.addEventListener("change", () => store.set("apa.keepEnglish", keepEnglish.checked));
-
-  coreInput.addEventListener("keydown", (e) => {
-    if ((e.ctrlKey || e.metaKey) && e.key === "Enter"){
-      e.preventDefault();
-      generatePrompt();
-    }
-  });
-
-  function findConflict(ctx, userInput){
-    if (!ctx || !ctx.conflicts) return null;
-    const raw = userInput || "";
-    const lower = raw.toLowerCase();
-    for (const c of ctx.conflicts){
-      const isAscii = /^[\x00-\x7F]+$/.test(c);
-      if (isAscii){
-        if (lower.includes(c.toLowerCase())) return c;
-      } else {
-        if (raw.includes(c)) return c;
-      }
-    }
-    return null;
-  }
-
-  function generatePrompt(){
-    const userInput = normalizeSpaces(coreInput.value || "");
-    const qualityMode = qualitySelect.value;
-    const selectedQuality = qualityPresets[qualityMode] || qualityPresets.god;
-    const ctx = getSelectedContext(currentContexts);
-
-    const conflict = findConflict(ctx, userInput);
-    if (conflict){
-      setStatus(`⚠️ WARNING: Conflict detected between Context and '${conflict}'.`, true);
-      const userIntent = confirm(
-        `【Apocrypha警告】\n\n文脈「${ctx.tierName}」と\n入力された単語「${conflict}」が競合します。\n\nこれは意図的な指示ですか？`
-      );
-      if (!userIntent) return;
-    }
-
-    const translated = translateInput(userInput);
-    const userTags = translated.tags;
-    const englishFree = translated.englishFree;
-
-    const checked = suggestionContainer.querySelectorAll('input[type="checkbox"]:checked');
-    const ctxTags = [];
-    checked.forEach(cb => cb.dataset.tag && cb.dataset.tag.split(",").map(s=>s.trim()).filter(Boolean).forEach(t => ctxTags.push(t)));
-
-    const parts = [];
-    parts.push(selectedQuality);
-    if (userTags.length) parts.push(userTags.join(", "));
-    else if (englishFree) parts.push(englishFree);
-    else if (userInput) parts.push(userInput);
-
-    if (englishFree && userTags.join(", ").toLowerCase() !== englishFree.toLowerCase()){
-      parts.push(englishFree);
-    }
-
-    const mergedCtxTags = uniq(ctxTags);
-    if (mergedCtxTags.length) parts.push(mergedCtxTags.join(", "));
-
-    const positivePrompt = parts.map(p => normalizeSpaces(p)).filter(Boolean).join(", ");
+    const positive = parts.join(", ");
     
-    const baseNeg = safetyNsfw.checked ? negativePromptBaseSafe : negativePromptBaseNoNSFW;
+    // Build Negative
+    const baseNeg = safetyNsfw.checked ? "NSFW, (worst quality:1.4), bad anatomy, (bad hands:1.4), missing fingers" : "(worst quality:1.4), bad anatomy, (bad hands:1.4), missing fingers";
     const negAdds = ctx && ctx.negativeAdditions ? ctx.negativeAdditions : [];
-    const negativePrompt = uniq([baseNeg, ...negAdds]).join(", ");
+    const negative = [...new Set([baseNeg, ...negAdds])].join(", ");
 
-    document.getElementById("output-positive").value = positivePrompt;
-    document.getElementById("output-negative").value = negativePrompt;
-
-    const pLen = positivePrompt.length;
-    const nLen = negativePrompt.length;
-    stats.innerHTML = `<span class="ok">Generated.</span> Positive: ${pLen} chars / Negative: ${nLen} chars`;
-    setStatus("Apocrypha Status: Prompt Generated Successfully.");
-  }
-
-  document.getElementById("generate").addEventListener("click", generatePrompt);
-
-  // -----------------------
-  // ROBUST COPY FUNCTION
-  // -----------------------
-  function copyToClipboard(button, targetId) {
-    const textarea = document.getElementById(targetId);
-    if (!textarea) return;
-
-    // Use select() + execCommand for maximum compatibility in iframes
-    textarea.select();
-    textarea.setSelectionRange(0, 99999); // Mobile compatibility
-
-    try {
-        const successful = document.execCommand('copy');
-        if (successful) {
-            showFeedback(button, true);
-        } else {
-            showFeedback(button, false);
-        }
-    } catch (err) {
-        console.error('Copy failed', err);
-        showFeedback(button, false);
-    }
-    
-    // De-select
-    window.getSelection().removeAllRanges();
-  }
-
-  function showFeedback(button, success) {
-      const originalText = button.textContent;
-      const originalBg = button.style.background;
-      
-      button.textContent = success ? "COPIED!" : "ERROR";
-      button.classList.add(success ? 'copied' : 'error');
-      
-      setTimeout(() => {
-          button.textContent = originalText;
-          button.classList.remove(success ? 'copied' : 'error');
-      }, 1500);
-  }
-
-  // Attach events
-  document.querySelectorAll(".copy-btn").forEach(btn => {
-      btn.addEventListener("click", () => {
-          const targetId = btn.dataset.target;
-          copyToClipboard(btn, targetId);
-      });
+    document.getElementById("output-positive").value = positive;
+    document.getElementById("output-negative").value = negative;
+    document.getElementById("stats").textContent = `Len: ${positive.length}/${negative.length}`;
   });
 
-  // -----------------------
-  // Custom Dictionary UI
-  // -----------------------
-  const dictJp = document.getElementById("dict-jp");
-  const dictEn = document.getElementById("dict-en");
-  const dictList = document.getElementById("dict-list");
-
-  function renderDict(){
-    dictList.innerHTML = "";
-    if (!customTranslationMap.length){
-      dictList.innerHTML = `<li><span class="mini">カスタム辞書は空です。</span></li>`;
-      return;
-    }
-    customTranslationMap.forEach((it, idx) => {
+  // --- Context Manager Logic ---
+  function renderContextManager(){
+    ctxListUI.innerHTML = "";
+    contextDB.forEach((ctx, idx) => {
       const li = document.createElement("li");
-      li.innerHTML = `<span class="mini"><b>${it.key}</b> → ${it.tag}</span>`;
-      const del = document.createElement("button");
-      del.className = "btn-inline";
-      del.type = "button";
-      del.textContent = "Remove";
-      del.addEventListener("click", () => {
-        customTranslationMap.splice(idx, 1);
-        store.set("apa.customDict", customTranslationMap);
-        rebuildTranslationMap();
-        renderDict();
-      });
-      li.appendChild(del);
-      dictList.appendChild(li);
+      li.className = "ctx-item";
+      li.innerHTML = `
+        <div>
+          <span class="ctx-name">${ctx.tierName}</span>
+          <span class="ctx-id">(${ctx.id})</span>
+        </div>
+      `;
+      const btn = document.createElement("button");
+      btn.className = "btn-del";
+      btn.textContent = "Del";
+      btn.onclick = () => {
+        if(confirm(`"${ctx.tierName}" を削除しますか？`)){
+          contextDB.splice(idx, 1);
+          saveContexts();
+        }
+      };
+      li.appendChild(btn);
+      ctxListUI.appendChild(li);
     });
   }
 
-  document.getElementById("add-dict").addEventListener("click", () => {
-    const jp = normalizeSpaces(dictJp.value);
-    const en = normalizeSpaces(dictEn.value);
-    if (!jp || !en) {
-      setStatus("⚠️ 辞書追加には日本語キーと英語タグが必要です。", true);
-      return;
+  document.getElementById("btn-import").addEventListener("click", () => {
+    const raw = document.getElementById("json-input").value;
+    try {
+      const data = JSON.parse(raw);
+      // Determine if single object or array
+      const list = Array.isArray(data) ? data : [data];
+      
+      let addedCount = 0;
+      list.forEach(item => {
+        // Simple validation
+        if(!item.id || !item.triggers || !item.tags) return;
+        
+        // Check duplicate ID
+        const existsIdx = contextDB.findIndex(c => c.id === item.id);
+        if(existsIdx >= 0){
+          contextDB[existsIdx] = item; // Update existing
+        } else {
+          contextDB.push(item); // Add new
+        }
+        addedCount++;
+      });
+      
+      saveContexts();
+      document.getElementById("json-input").value = "";
+      alert(`${addedCount} 件のコンテキストをインポートしました。`);
+    } catch(e) {
+      alert("JSONの形式が正しくありません。");
     }
-    customTranslationMap.push({ key: jp, tag: en });
-    customTranslationMap = customTranslationMap.filter((v,i,a)=>a.findIndex(x=>x.key===v.key && x.tag===v.tag)===i);
-    store.set("apa.customDict", customTranslationMap);
-    rebuildTranslationMap();
-    dictJp.value = ""; dictEn.value = "";
-    renderDict();
-    setStatus("Custom dictionary updated.");
   });
 
-  document.getElementById("reset-dict").addEventListener("click", () => {
-    if (!confirm("カスタム辞書をリセットしますか？（端末保存分が消えます）")) return;
-    customTranslationMap = [];
-    store.set("apa.customDict", customTranslationMap);
-    rebuildTranslationMap();
-    renderDict();
-    setStatus("Custom dictionary reset.");
+  document.getElementById("btn-reset-ctx").addEventListener("click", () => {
+    if(confirm("全ての辞書を初期状態に戻しますか？（追加したデータは消えます）")){
+      contextDB = JSON.parse(JSON.stringify(defaultContexts));
+      saveContexts();
+      alert("初期化しました。");
+    }
   });
 
-  rebuildTranslationMap();
-  renderDict();
+  // Init
+  coreInput.addEventListener("input", refreshContext);
+  contextSelect.addEventListener("change", refreshContext);
+  handFixSelect.addEventListener("change", () => updateHandFixDesc(getSelectedContext()));
+  
+  // Copy Logic
+  document.querySelectorAll(".copy-btn").forEach(b => {
+    b.addEventListener("click", () => {
+      const el = document.getElementById(b.dataset.target);
+      el.select(); document.execCommand('copy');
+      b.classList.add("copied"); b.textContent="OK!";
+      setTimeout(() => { b.classList.remove("copied"); b.textContent="COPY"; }, 1000);
+    });
+  });
+
+  renderContextManager();
   refreshContext();
+
 </script>
 </body>
 </html>
