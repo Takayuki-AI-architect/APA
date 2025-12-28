@@ -1,0 +1,296 @@
+[
+  {
+    "id": "ctx_miko",
+    "triggers": ["巫女", "神社", "鳥居", "おみくじ", "鈴", "千歳飴", "miko", "shrine maiden", "shrine"],
+    "tier": 1,
+    "tierName": "Tier 1: Shrine Maiden (Miko)",
+    "tags": [
+      { "id": "miko_outfit", "label": "巫女装束", "tag": "miko, hakama, white kosode, red hakama, tabi", "active": true },
+      { "id": "hair", "label": "黒髪ロング", "tag": "long black hair", "active": true },
+      { "id": "accessory", "label": "神楽鈴", "tag": "holding kagura suzu bells", "active": true }
+    ],
+    "conflicts": ["bikini", "swimsuit", "armor", "gothic", "cyberpunk", "水着"],
+    "negativeAdditions": ["neon lights", "robot", "gun", "modern city"],
+    "handFix": { "auto": "praying hands", "hold": "holding omamori, holding broom", "hide": "hands in sleeves" }
+  },
+  {
+    "id": "ctx_kyudo",
+    "triggers": ["弓道", "弓", "矢", "道場", "袴", "弓具", "kyudo", "archery"],
+    "tier": 1,
+    "tierName": "Tier 1: Kyudo (Japanese Archery)",
+    "tags": [
+      { "id": "kyudo_uniform", "label": "弓道着", "tag": "kyudo uniform, hakama, white kimono", "active": true },
+      { "id": "equipment", "label": "弓矢/ゆがけ", "tag": "holding japanese bow, yugake glove", "active": true },
+      { "id": "place", "label": "弓道場", "tag": "kyudo dojo background", "active": true }
+    ],
+    "conflicts": ["bikini", "maid outfit", "school uniform", "futuristic", "western archery"],
+    "negativeAdditions": ["gun", "sword", "neon", "western bow"],
+    "handFix": { "auto": "drawing bow", "hold": "holding bow and arrow", "hide": "hands behind back" }
+  },
+  {
+    "id": "ctx_yukata",
+    "triggers": ["夏祭り", "浴衣", "花火", "金魚すくい", "屋台", "団子", "yukata", "festival", "matsuri"],
+    "tier": 2,
+    "tierName": "Tier 2: Summer Festival (Yukata)",
+    "tags": [
+      { "id": "clothing", "label": "浴衣", "tag": "yukata, floral print", "active": true },
+      { "id": "shoes", "label": "下駄", "tag": "geta", "active": true },
+      { "id": "bg", "label": "祭り屋台/花火", "tag": "festival stalls, fireworks, night", "active": true }
+    ],
+    "conflicts": ["christmas", "snow", "santa", "winter coat", "kimono"],
+    "negativeAdditions": ["snow", "christmas tree", "heavy makeup", "thick coat"],
+    "handFix": { "auto": "holding fan", "hold": "holding apple candy, holding goldfish bag", "hide": "hands in sleeves" }
+  },
+  {
+    "id": "ctx_hanami",
+    "triggers": ["お花見", "桜", "弁当", "シート", "酒", "sakura", "cherry blossoms", "hanami"],
+    "tier": 2,
+    "tierName": "Tier 2: Cherry Blossom (Hanami)",
+    "tags": [
+      { "id": "bg", "label": "満開の桜", "tag": "cherry blossoms, sakura trees, falling petals", "active": true },
+      { "id": "item", "label": "花見弁当/酒", "tag": "picnic sheet, bento box, sake bottle", "active": true },
+      { "id": "clothes", "label": "春の装い", "tag": "casual clothes, light kimono", "active": true }
+    ],
+    "conflicts": ["snow", "halloween", "christmas", "beach"],
+    "negativeAdditions": ["pumpkin", "ghost", "santa hat", "autumn leaves"],
+    "handFix": { "auto": "sitting on sheet", "hold": "holding sake cup, eating dango", "hide": "hands on lap" }
+  },
+  {
+    "id": "ctx_kendo",
+    "triggers": ["剣道", "竹刀", "面", "胴", "袴", "防具", "kendo", "bogu", "shinai"],
+    "tier": 1,
+    "tierName": "Tier 1: Kendo",
+    "tags": [
+      { "id": "uniform", "label": "剣道着/防具", "tag": "kendo uniform, bogu armor, tare", "active": true },
+      { "id": "item", "label": "竹刀", "tag": "holding shinai", "active": true },
+      { "id": "mask", "label": "面 (Men)", "tag": "kendo mask (men)", "active": true }
+    ],
+    "conflicts": ["bikini", "magical girl", "mecha", "sword"],
+    "negativeAdditions": ["wand", "wings", "robot armor", "katana"],
+    "handFix": { "auto": "kendo stance", "hold": "holding shinai with both hands", "hide": "hands behind back" }
+  },
+  {
+    "id": "ctx_medieval_noble",
+    "triggers": ["中世", "城", "貴族", "ドレス", "騎士", "medieval", "castle", "knight", "noble"],
+    "tier": 2,
+    "tierName": "Tier 2: Medieval Nobility",
+    "tags": [
+      { "id": "dress", "label": "中世ドレス", "tag": "medieval gown, corset, embroidery", "active": true },
+      { "id": "bg", "label": "石造りの城", "tag": "stone castle interior, throne room", "active": true },
+      { "id": "feature", "label": "西洋風", "tag": "european features", "active": true }
+    ],
+    "conflicts": ["kimono", "yukata", "neon", "cyberpunk", "smartphone"],
+    "negativeAdditions": ["neon", "robot", "japanese clothes", "tatami"],
+    "handFix": { "auto": "elegant standing pose", "hold": "holding fan, holding wine glass", "hide": "hands folded in front" }
+  },
+  {
+    "id": "ctx_magical_girl",
+    "triggers": ["魔法少女", "変身", "杖", "フリル", "セーラー", "magical girl", "wand", "mahou shoujo"],
+    "tier": 3,
+    "tierName": "Tier 3: Magical Girl",
+    "tags": [
+      { "id": "outfit", "label": "魔法少女コス", "tag": "frilled dress, magical girl outfit, ribbons", "active": true },
+      { "id": "item", "label": "魔法の杖", "tag": "holding magical wand, glowing", "active": true },
+      { "id": "hair", "label": "ツインテ/派手髪", "tag": "twin tails, pink hair, bright colors", "active": true }
+    ],
+    "conflicts": ["military uniform", "realistic armor", "horror", "blood"],
+    "negativeAdditions": ["blood", "gun", "dark fantasy", "gloomy"],
+    "handFix": { "auto": "dynamic transformation pose", "hold": "holding wand high", "hide": "hands behind back" }
+  },
+  {
+    "id": "ctx_military",
+    "triggers": ["軍服", "将校", "制服", "帽子", "階級章", "military uniform", "officer", "army"],
+    "tier": 2,
+    "tierName": "Tier 2: Military Officer",
+    "tags": [
+      { "id": "uniform", "label": "軍服", "tag": "military uniform, double breasted", "active": true },
+      { "id": "hat", "label": "軍帽", "tag": "peaked cap, military hat", "active": true },
+      { "id": "detail", "label": "勲章/階級章", "tag": "epaulettes, medals", "active": true }
+    ],
+    "conflicts": ["yukata", "kimono", "magical girl", "frills"],
+    "negativeAdditions": ["ribbon", "wand", "cat ears", "maid"],
+    "handFix": { "auto": "salute", "hold": "holding riding crop", "hide": "hands behind back" }
+  },
+  {
+    "id": "ctx_maid_cafe",
+    "triggers": ["メイド", "ご主人様", "お帰り", "maid", "cafe", "maid cafe"],
+    "tier": 3,
+    "tierName": "Tier 3: Maid Cafe",
+    "tags": [
+      { "id": "outfit", "label": "メイド服", "tag": "maid outfit, white apron, frills", "active": true },
+      { "id": "head", "label": "ヘッドドレス", "tag": "white headdress", "active": true },
+      { "id": "pose", "label": "接客ポーズ", "tag": "curtsy, welcome pose", "active": true }
+    ],
+    "conflicts": ["kimono", "military", "horror", "armor"],
+    "negativeAdditions": ["blood", "gun", "traditional japanese clothes", "dirt"],
+    "handFix": { "auto": "heart hands sign", "hold": "holding serving tray", "hide": "hands behind back" }
+  },
+  {
+    "id": "ctx_gothic_lolita",
+    "triggers": ["ゴスロリ", "ロリータ", "ドレス", "リボン", "gothic lolita", "lolita fashion"],
+    "tier": 3,
+    "tierName": "Tier 3: Gothic Lolita",
+    "tags": [
+      { "id": "dress", "label": "ゴスロリドレス", "tag": "gothic lolita dress, black and white", "active": true },
+      { "id": "head", "label": "ボンネット", "tag": "bonnet, ribbons", "active": true },
+      { "id": "item", "label": "日傘", "tag": "holding parasol", "active": true }
+    ],
+    "conflicts": ["military", "sportswear", "casual jeans", "swimsuit"],
+    "negativeAdditions": ["sneakers", "gun", "armor", "t-shirt"],
+    "handFix": { "auto": "elegant pose", "hold": "holding parasol", "hide": "hands folded" }
+  },
+  {
+    "id": "ctx_beach",
+    "triggers": ["海", "ビーチ", "水着", "砂浜", "パラソル", "beach", "swimsuit", "ocean"],
+    "tier": 3,
+    "tierName": "Tier 3: Beach / Swimsuit",
+    "tags": [
+      { "id": "swimwear", "label": "水着", "tag": "bikini, swimsuit", "active": true },
+      { "id": "bg", "label": "砂浜と海", "tag": "beach background, ocean, sunny sky", "active": true },
+      { "id": "item", "label": "サングラス/ボール", "tag": "sunglasses on head, beach ball", "active": true }
+    ],
+    "conflicts": ["kimono", "yukata", "tatami", "tea ceremony", "winter coat"],
+    "negativeAdditions": ["tatami", "japanese tea set", "winter coat", "snow"],
+    "handFix": { "auto": "stretching arms", "hold": "holding beach ball", "hide": "hands behind head" }
+  },
+  {
+    "id": "ctx_christmas",
+    "triggers": ["クリスマス", "サンタ", "ツリー", "雪", "プレゼント", "christmas", "santa", "xmas"],
+    "tier": 3,
+    "tierName": "Tier 3: Christmas / Winter",
+    "tags": [
+      { "id": "outfit", "label": "サンタ衣装", "tag": "santa costume, santa hat, red dress", "active": true },
+      { "id": "bg", "label": "雪とツリー", "tag": "christmas tree, snow, winter, lights", "active": true },
+      { "id": "item", "label": "プレゼント", "tag": "holding gift box", "active": true }
+    ],
+    "conflicts": ["yukata", "summer festival", "fireworks", "bikini"],
+    "negativeAdditions": ["fireworks", "yukata", "goldfish scoop", "swimsuit"],
+    "handFix": { "auto": "praying pose", "hold": "holding present", "hide": "hands in mittens" }
+  },
+  {
+    "id": "ctx_ninja",
+    "triggers": ["忍者", "くノ一", "手裏剣", "暗器", "忍び装束", "ninja", "kunoichi", "shinobi"],
+    "tier": 2,
+    "tierName": "Tier 2: Ninja / Kunoichi",
+    "tags": [
+      { "id": "outfit", "label": "忍び装束", "tag": "ninja outfit, fishnet mesh", "active": true },
+      { "id": "item", "label": "クナイ/手裏剣", "tag": "holding kunai, shuriken", "active": true },
+      { "id": "face", "label": "覆面/マスク", "tag": "mouth mask, scarf", "active": true }
+    ],
+    "conflicts": ["magical girl wand", "military uniform", "bikini", "frills"],
+    "negativeAdditions": ["frills", "ribbon", "gun", "western sword"],
+    "handFix": { "auto": "ninja hand seal", "hold": "holding kunai", "hide": "arms crossed" }
+  },
+  {
+    "id": "ctx_sengoku",
+    "triggers": ["戦国", "武将", "甲冑", "兜", "旗", "sengoku", "samurai armor", "shogun"],
+    "tier": 1,
+    "tierName": "Tier 1: Sengoku (Samurai Armor)",
+    "tags": [
+      { "id": "armor", "label": "日本の甲冑", "tag": "japanese armor, o-yoroi", "active": true },
+      { "id": "helmet", "label": "兜", "tag": "kabuto helmet", "active": true },
+      { "id": "weapon", "label": "日本刀", "tag": "katana, sword", "active": true }
+    ],
+    "conflicts": ["cyberpunk", "neon", "bikini", "modern clothes"],
+    "negativeAdditions": ["neon lights", "robot", "gun", "suit"],
+    "handFix": { "auto": "commanding pose", "hold": "holding katana", "hide": "hands on hips" }
+  },
+  {
+    "id": "ctx_jp_horror",
+    "triggers": ["幽霊", "お化け", "呪い", "廃墟", "井戸", "horror", "yurei", "ghost"],
+    "tier": 2,
+    "tierName": "Tier 2: Japanese Horror",
+    "tags": [
+      { "id": "ghost", "label": "幽霊", "tag": "yurei, ghost, pale skin", "active": true },
+      { "id": "hair", "label": "ざんばら髪", "tag": "long black hair covering face", "active": true },
+      { "id": "clothes", "label": "死装束", "tag": "white kimono", "active": true }
+    ],
+    "conflicts": ["bright colors", "magical girl", "beach", "happy"],
+    "negativeAdditions": ["bikini", "fireworks", "christmas lights", "smiling"],
+    "handFix": { "auto": "dangling hands", "hold": "reaching towards viewer", "hide": "hands invisible" }
+  },
+  {
+    "id": "ctx_scifi_ship",
+    "triggers": ["宇宙船", "艦橋", "宇宙服", "スターシップ", "spaceship", "bridge", "space"],
+    "tier": 3,
+    "tierName": "Tier 3: Sci-Fi Spaceship",
+    "tags": [
+      { "id": "suit", "label": "パイロットスーツ", "tag": "plugsuit, spacesuit, tight bodysuit", "active": true },
+      { "id": "bg", "label": "艦橋/宇宙", "tag": "spaceship bridge, control panel, space background", "active": true },
+      { "id": "tech", "label": "ホログラム", "tag": "holographic interface", "active": true }
+    ],
+    "conflicts": ["kimono", "tatami", "medieval castle", "wood"],
+    "negativeAdditions": ["tatami", "cherry blossoms", "castle", "nature"],
+    "handFix": { "auto": "operating controls", "hold": "holding helmet", "hide": "hands behind back" }
+  },
+  {
+    "id": "ctx_elf_forest",
+    "triggers": ["エルフ", "森", "弓", "耳", "ファンタジー", "elf", "forest", "fantasy"],
+    "tier": 3,
+    "tierName": "Tier 3: Fantasy Elf",
+    "tags": [
+      { "id": "feature", "label": "エルフ耳", "tag": "pointy ears, elf", "active": true },
+      { "id": "bg", "label": "神秘の森", "tag": "fantasy forest, nature, sunlight", "active": true },
+      { "id": "outfit", "label": "軽装鎧", "tag": "leather armor, green tunic", "active": true }
+    ],
+    "conflicts": ["cyberpunk", "military uniform", "kimono", "gun"],
+    "negativeAdditions": ["neon", "gun", "tatami", "modern building"],
+    "handFix": { "auto": "standing in forest", "hold": "holding bow", "hide": "hands clasped" }
+  },
+  {
+    "id": "ctx_steampunk",
+    "triggers": ["スチームパンク", "歯車", "ゴーグル", "ビクトリア", "steampunk", "gears"],
+    "tier": 3,
+    "tierName": "Tier 3: Steampunk",
+    "tags": [
+      { "id": "style", "label": "スチームパンク", "tag": "steampunk style, brass, gears", "active": true },
+      { "id": "item", "label": "ゴーグル", "tag": "goggles on head", "active": true },
+      { "id": "clothes", "label": "コルセット/革", "tag": "corset, leather belt, victorian influence", "active": true }
+    ],
+    "conflicts": ["kimono", "futuristic neon", "magical wand", "modern"],
+    "negativeAdditions": ["neon lights", "kimono", "tracksuit", "plastic"],
+    "handFix": { "auto": "adjusting goggles", "hold": "holding wrench", "hide": "hands in pockets" }
+  },
+  {
+    "id": "ctx_school",
+    "triggers": ["制服", "セーラー服", "ブレザー", "教室", "school uniform", "sailor", "classroom"],
+    "tier": 3,
+    "tierName": "Tier 3: Japanese School",
+    "tags": [
+      { "id": "outfit", "label": "セーラー/ブレザー", "tag": "school uniform, sailor collar, pleated skirt", "active": true },
+      { "id": "bg", "label": "教室/学校", "tag": "classroom, school desk", "active": true },
+      { "id": "item", "label": "スクールバッグ", "tag": "school bag", "active": true }
+    ],
+    "conflicts": ["military officer uniform", "armor", "bikini", "gown"],
+    "negativeAdditions": ["gun", "sword", "heavy armor", "helmet"],
+    "handFix": { "auto": "sitting at desk", "hold": "holding book", "hide": "hands behind back" }
+  },
+  {
+    "id": "ctx_jp_cook",
+    "triggers": ["料理", "和食", "包丁", "まな板", "寿司", "懐石", "cooking", "japanese food", "kitchen"],
+    "tier": 2,
+    "tierName": "Tier 2: Japanese Cooking",
+    "tags": [
+      { "id": "outfit", "label": "割烹着/エプロン", "tag": "white apron, japanese chef outfit", "active": true },
+      { "id": "action", "label": "料理中", "tag": "cooking, cutting food", "active": true },
+      { "id": "bg", "label": "台所", "tag": "kitchen background", "active": true }
+    ],
+    "conflicts": ["bikini", "armor", "cyberpunk", "dirty"],
+    "negativeAdditions": ["robot arm", "gun", "sword", "blood"],
+    "handFix": { "auto": "cooking pose", "hold": "holding kitchen knife", "hide": "hands washing" }
+  },
+  {
+    "id": "ctx_calligraphy",
+    "triggers": ["書道", "習字", "筆", "墨", "半紙", "座卓", "calligraphy", "brush", "shodo"],
+    "tier": 1,
+    "tierName": "Tier 1: Calligraphy (Shodo)",
+    "tags": [
+      { "id": "action", "label": "書道", "tag": "doing calligraphy, writing kanji", "active": true },
+      { "id": "item", "label": "筆/硯", "tag": "holding brush, inkstone, paper", "active": true },
+      { "id": "pose", "label": "正座", "tag": "kneeling, seiza, concentrated", "active": true }
+    ],
+    "conflicts": ["swimsuit", "military", "neon", "standing"],
+    "negativeAdditions": ["gun", "bikini", "western pen", "chair"],
+    "handFix": { "auto": "writing with brush", "hold": "holding brush tightly", "hide": "hands on lap" }
+  }
+]
